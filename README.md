@@ -1,4 +1,4 @@
 # Little-Lemon
 Meta Front-End Developer Capstone Final Project
 
-# Demo: [Little Lemon](https://shahandfahad.github.io/Little-Lemon/)
+# Demo: [Little Lemon](https://github.com/Mithlesh8359/Little-Lemon)
