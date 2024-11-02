@@ -1,65 +1,63 @@
 import BookingForm from "./BookingForm";
-import { fetchAPI, submitAPI} from '../../utilities/API';
-import { React, useReducer } from "react";
+import { fetchAPI, submitAPI } from '../../utilities/API';
+import React, { useReducer, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { useNavigate, redirect } from "react-router-dom";
+// Initial state for time slots
+const initialState = { morning: [], afternoon: [], evening: [] };
 
-
-const updateTimeSlots = (availableTimeSlots, date) => {
-  const response = fetchAPI(new Date(date));
- 
-  return (
-    response.morning.length !== 0 && response.afternoon.length !== 0 && response.evening.length !== 0
-    ) ? response : availableTimeSlots; 
-}
-
-const initTimeSlots = (initAvaliableTimeSlots) => {
-    // return [...initAvaliableTimeSlots, ...fetchAPI(new Date())];
-    return {
-        morning: [...initAvaliableTimeSlots.morning, ...fetchAPI(new Date()).morning], 
-        afternoon: [...initAvaliableTimeSlots.afternoon, ...fetchAPI(new Date()).afternoon], 
-        evening: [...initAvaliableTimeSlots.evening, ...fetchAPI(new Date()).evening]
-    };
-}
+// Reducer function to manage available time slots
+const timeSlotsReducer = (state, action) => {
+    switch (action.type) {
+        case 'SET_TIME_SLOTS':
+            return { ...state, ...action.payload };
+        default:
+            return state;
+    }
+};
 
 const Reservations = () => {
+    const navigate = useNavigate();
+    const [availableTimeSlots, dispatchTimeSlots] = useReducer(timeSlotsReducer, initialState);
 
-  // Reducer hook which will update the available time slots and initialize the available time slots
-   const [
-    availableTimeSlots, 
-    dispatchTimeslotsOnDateChange
-  ] = useReducer(updateTimeSlots, {morning: [], afternoon: [], evening: []}, initTimeSlots);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetchAPI(new Date());
+                dispatchTimeSlots({ type: 'SET_TIME_SLOTS', payload: response });
+            } catch (error) {
+                console.error("Error fetching time slots:", error);
+                alert("Failed to fetch available time slots.");
+            }
+        };
+        fetchData();
+    }, []);
 
-  const navigate = useNavigate();
+    // Function to submit reservation data to the server
+    const submitReservation = async (reservation) => {
+        console.log("Reservation Form Data: ", reservation);
+        try {
+            const response = await submitAPI(reservation);
+            if (response) {
+                navigate('/ConfirmedBooking'); // Navigate on successful submission
+            } else {
+                alert("Data Submission Failed");
+            }
+        } catch (error) {
+            console.error("Error submitting reservation:", error);
+            alert("Data Submission Failed due to an error.");
+        }
+    };
 
-  // Handler Function to submit the reservation data to the server
-  const submitReservation = (reservation) => {
-    console.log("Reservation From Data: ", reservation);
-    const response = submitAPI(reservation);
-
-    const confrimPageMap = new Map();
-    confrimPageMap.set("confirmedBooking", {name: 'Confirmed Booking', path: '/ConfirmedBooking', anchorable: true});
-
-
-    if (response) {
-      // alert("Data Submitted Successfully");
-      navigate(confrimPageMap.get("confirmedBooking").path);
-    } else {
-      alert("Data Submission Failed");
-    }
-
-  }
-
-
-  return (
-    <>
-      <BookingForm 
-        submitReservation={submitReservation} 
-        availableTimeSlots={availableTimeSlots} 
-        dispatchTimeslotsOnDateChange={dispatchTimeslotsOnDateChange}
-      />
-    </>
-  )
+    return (
+        <>
+            <BookingForm 
+                submitReservation={submitReservation} 
+                availableTimeSlots={availableTimeSlots} 
+                dispatchTimeslotsOnDateChange={dispatchTimeSlots}
+            />
+        </>
+    );
 };
 
 export default Reservations;
