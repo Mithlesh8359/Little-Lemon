@@ -5,7 +5,7 @@ import BookingForm from "./BookingForm";
 
   const availableTimeSlots = ['17:00', '17:30'];
   const today = new Date().toISOString().split('T')[0];
-  const dispatchOnDateChange = jest.fn();
+  //const dispatchOnDateChange = jest.fn();
   const submitReservation = jest.fn();
 
 
