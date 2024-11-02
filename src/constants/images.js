@@ -14,4 +14,24 @@ import resturantChefB from '../assets/restaurantChefB.jpg';
 import bookingConfirmed from '../assets/bookingConfirmed.png';
 import underConstruction from '../assets/underConstruction.PNG';
 
-export default {logo, greekSalad, resturantFood, lemonDessert, bruchetta, MarioandAdrianA, MarioandAdrianb, resturant, sajal, ramsha, mawra, iqsf, resturantChefB, bookingConfirmed, underConstruction};
+// Assigning the object to a variable
+const images = {
+  logo,
+  greekSalad,
+  resturantFood,
+  lemonDessert,
+  bruchetta,
+  MarioandAdrianA,
+  MarioandAdrianb,
+  resturant,
+  sajal,
+  ramsha,
+  mawra,
+  iqsf,
+  resturantChefB,
+  bookingConfirmed,
+  underConstruction,
+};
+
+// Exporting the variable
+export default images;
