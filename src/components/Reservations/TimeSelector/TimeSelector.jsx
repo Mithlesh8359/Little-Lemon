@@ -1,76 +1,55 @@
 import './TimeSelector.css';
-import React, { useState } from 'react';
+import React from 'react';
 
 const TimeCapsule = (props) => {
-
-    // get the current time value  and pass to parent component
-    const handleRadioChage = (e) => {
+    const handleRadioChange = (e) => {
         props.chooseTime(e.target.value);
-    }
-
+    };
 
     return (
-            <div>
-                <h1>{props.morning}</h1>
-                <div className='timeslots-capsules' >
-                {
-                    props.slots.map((item) => {
-                        return (
-                        <span className='radio-lablel-box'>
-                            <label htmlFor={item} className='radio-btn-label'>
-                                <input type="radio" name="timeslots-m" id={item} value={item} onClick={handleRadioChage} />
-                                {item}
-                            </label>
-                        </span>)
-                    })
-                }
-                </div>
-            </div> 
+        <div>
+            <h1>{props.morning}</h1>
+            <div className='timeslots-capsules'>
+                {props.slots.map((item) => (
+                    <span className='radio-label-box' key={item}>
+                        <label htmlFor={item} className='radio-btn-label'>
+                            <input 
+                                type="radio" 
+                                name="timeslots-m" 
+                                id={item} 
+                                value={item} 
+                                onChange={handleRadioChange} // Changed to onChange for better semantics
+                            />
+                            {item}
+                        </label>
+                    </span>
+                ))}
+            </div>
+        </div>
     );
-}
+};
 
 const TimeSelector = (props) => {
-    const hour = new Date().toTimeString().split(' ')[0].split(':');
-    // console.log("Time: ", hour);
+    const hour = new Date().getHours(); // Get the current hour as an integer
 
-    let isMorning = false;
-    let isAfternoon = false;
-    let isEvening = false;
-    // const hour = 21;
-    if (parseInt(hour) >= 9 && parseInt(hour) < 12) {
-
-        isMorning = true;
-        isAfternoon = false;
-        isEvening = false;
-
-    } else if (parseInt(hour) >= 12 && parseInt(hour) < 16) {
-
-        isMorning = false;
-        isAfternoon = true;
-        isEvening = false;
-    } else if (parseInt(hour) >= 16 && parseInt(hour) < 21) {
-
-        isMorning = false;
-        isAfternoon = false;
-        isEvening = true;
-
+    let timeOfDay = '';
+    if (hour >= 9 && hour < 12) {
+        timeOfDay = 'morning';
+    } else if (hour >= 12 && hour < 16) {
+        timeOfDay = 'afternoon';
+    } else if (hour >= 16 && hour < 21) {
+        timeOfDay = 'evening';
     }
 
-    
     return (
         <div className="reservation__time-selector">
-            {
-                (isMorning && ( <TimeCapsule chooseTime={props.chooseTime} morning="Morning" slots={props.availableTimeSlots.morning} /> ))
-
-                ||
-
-                (isAfternoon && ( <TimeCapsule chooseTime={props.chooseTime} morning="Afternoon" slots={props.availableTimeSlots.afternoon}/>))
-
-                ||
-
-                (isEvening && ( <TimeCapsule chooseTime={props.chooseTime} morning="Evening" slots={props.availableTimeSlots.evening}/> ))
-
-            }
+            {timeOfDay && (
+                <TimeCapsule 
+                    chooseTime={props.chooseTime} 
+                    morning={timeOfDay.charAt(0).toUpperCase() + timeOfDay.slice(1)} 
+                    slots={props.availableTimeSlots[timeOfDay]} 
+                />
+            )}
         </div>
     );
 };
