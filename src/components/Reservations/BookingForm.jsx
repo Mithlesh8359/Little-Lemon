@@ -1,92 +1,57 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import GuestSelector from './GuestSelector/GuestSelector';
-import DateSelecotr from './DateSelector/DateSelector';
+import DateSelector from './DateSelector/DateSelector'; // Fixed typo from DateSelecotr
 import TimeSelector from './TimeSelector/TimeSelector';
-
 import Reserve from './Reserve/Reserve';
 
 function BookingForm(props) {
   const [time, setTime] = useState('00:00');
   const [guests, setGuests] = useState(1);
   const [date, setDate] = useState('');
-  const [ocassion, setOccasion] = useState('birthday');
+  const [occasion, setOccasion] = useState('birthday'); // Corrected spelling to 'occasion'
 
-  // contains the data of the user from the reservation page which will be submitted via server to the database
-  const [reservation, setReservation] = useState({guests: guests, date: '', time: '', ocassion: ocassion});
+  const [reservation, setReservation] = useState({ guests, date, time, occasion });
 
-  // handler function in the Parent component
-  // time is passed to it from child component
-  /*
-    passing chooseTime handler function as props to TimeSelector component and then to TimeCapsule component from there on each click on radio button a specific time value is passed to it.
-  */
   const chooseTime = (time) => {
     setTime(time);
+    setReservation((prev) => ({ ...prev, time }));
+  };
 
-    setReservation({...reservation, time: time});
-  }
-
-  // handler function in the Parent component
   const chooseGuest = (guests) => {
     setGuests(guests);
-    setReservation({...reservation, guests: guests});
-  }
-
-  // handler function in the Parent component to get date selected from child ccomponent
+    setReservation((prev) => ({ ...prev, guests }));
+  };
 
   const chooseDate = (date) => {
     setDate(date);
-    setReservation({...reservation, date: date});
-
+    setReservation((prev) => ({ ...prev, date }));
     props.dispatchTimeslotsOnDateChange(date);
+  };
 
-  }    
+  const chooseOccasion = (occasion) => {
+    setOccasion(occasion);
+    setReservation((prev) => ({ ...prev, occasion }));
+  };
 
-  const chooseOcassion = (ocassion) => {
-    setOccasion(ocassion);
-
-    // reservationData['ocassion'] = ocassion;
-    setReservation({...reservation, ocassion: ocassion});
-  }
-
-
-
-  // Form Submission
   const onSubmitHandler = (e) => {
     e.preventDefault();
-
-    // Submission happens here
-    
     props.submitReservation(reservation);
-  }
-
+  };
 
   const validateReservation = () => {
-    if (reservation.time !== '' && 
-        reservation.date !== '' && 
-        reservation.guests !== '' && 
-        reservation.ocassion !== '') {
-      return true;
-    }
-
-    return false;
-  }
-
+    return reservation.time && reservation.date && reservation.guests && reservation.occasion;
+  };
 
   return (
     <div>
       <form onSubmit={onSubmitHandler}>
-        <GuestSelector chooseGuest={ chooseGuest } />
-
-        <DateSelecotr chooseDate={chooseDate} chooseOcassion={chooseOcassion} ocassion={ocassion}/>
-
-        <TimeSelector chooseTime={ chooseTime } availableTimeSlots={props.availableTimeSlots} />
-
-        { // Enable, Disable Submit button on form validation
-          validateReservation() ? <Reserve value={0} /> : <Reserve value={1} />
-        }
+        <GuestSelector chooseGuest={chooseGuest} />
+        <DateSelector chooseDate={chooseDate} chooseOccasion={chooseOccasion} occasion={occasion} />
+        <TimeSelector chooseTime={chooseTime} availableTimeSlots={props.availableTimeSlots} />
+        <Reserve value={validateReservation() ? 0 : 1} />
       </form>
     </div>
   );
-};
+}
 
 export default BookingForm;
